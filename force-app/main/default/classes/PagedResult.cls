@@ -1,7 +1,7 @@
 public with sharing class PagedResult {
     @AuraEnabled
     public Integer pageSize { get; set; }
-
+//gokul changes
     @AuraEnabled
     public Integer pageNumber { get; set; }
 
