@@ -2,13 +2,9 @@ import { createElement } from 'lwc';
 import BrokerCard from 'c/brokerCard';
 import { getNavigateCalledWith } from 'lightning/navigation';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
-import { registerLdsTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 
 // Mock realistic data
 const mockGetPropertyRecord = require('./data/getPropertyRecord.json');
-
-// Register as an LDS wire adapter. Some tests verify the provisioned values trigger desired behavior.
-const getRecordAdapter = registerLdsTestWireAdapter(getRecord);
 
 const BROKER_ID = 'a003h000003xlBiAAI';
 
@@ -44,13 +40,12 @@ describe('c-broker-card', () => {
 
     // Helper function to wait until the microtask queue is empty. This is needed for promise
     // timing.
-    function flushPromises() {
-        // eslint-disable-next-line no-undef
-        return new Promise((resolve) => setImmediate(resolve));
+    async function flushPromises() {
+        return Promise.resolve();
     }
 
     describe('broker record form', () => {
-        it('gets property data from wire service', () => {
+        it('gets property data from wire service', async () => {
             // Create element
             const element = createElement('c-broker-card', {
                 is: BrokerCard
@@ -58,18 +53,19 @@ describe('c-broker-card', () => {
             document.body.appendChild(element);
 
             // Emit data from @wire
-            getRecordAdapter.emit(mockGetPropertyRecord);
+            getRecord.emit(mockGetPropertyRecord);
 
-            return flushPromises().then(() => {
-                const propertyEl = element.shadowRoot.querySelector(
-                    'lightning-record-form'
-                );
-                expect(getFieldValue).toHaveBeenCalled();
-                expect(propertyEl.recordId).toBe(BROKER_ID);
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            const propertyEl = element.shadowRoot.querySelector(
+                'lightning-record-form'
+            );
+            expect(getFieldValue).toHaveBeenCalled();
+            expect(propertyEl.recordId).toBe(BROKER_ID);
         });
 
-        it('renders lightning-record-form with given input values', () => {
+        it('renders lightning-record-form with given input values', async () => {
             // Create element
             const element = createElement('c-broker-card', {
                 is: BrokerCard
@@ -77,23 +73,21 @@ describe('c-broker-card', () => {
             document.body.appendChild(element);
 
             // Emit data from @wire
-            getRecordAdapter.emit(mockGetPropertyRecord);
+            getRecord.emit(mockGetPropertyRecord);
 
-            // Return a promise to wait for any asynchronous DOM updates. Jest
-            // will automatically wait for the Promise chain to complete before
-            // ending the test and fail the test if the promise rejects.
-            return flushPromises().then(() => {
-                const propertyEl = element.shadowRoot.querySelector(
-                    'lightning-record-form'
-                );
-                expect(propertyEl.fields).toEqual(BROKER_FIELDS_INPUT);
-                expect(propertyEl.recordId).toBe(BROKER_ID);
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            const propertyEl = element.shadowRoot.querySelector(
+                'lightning-record-form'
+            );
+            expect(propertyEl.fields).toEqual(BROKER_FIELDS_INPUT);
+            expect(propertyEl.recordId).toBe(BROKER_ID);
         });
     });
 
     describe('navigate to broker record', () => {
-        it('navigates to record view', () => {
+        it('navigates to record view', async () => {
             // Nav param values to test later
             const NAV_TYPE = 'standard__recordPage';
             const NAV_OBJECT_API_NAME = 'Property__c';
@@ -107,34 +101,30 @@ describe('c-broker-card', () => {
             document.body.appendChild(element);
 
             // Simulate the data sent over wire adapter to hydrate the wired property
-            getRecordAdapter.emit(mockGetPropertyRecord);
+            getRecord.emit(mockGetPropertyRecord);
 
-            // Return a promise to wait for any asynchronous DOM updates. Jest
-            // will automatically wait for the Promise chain to complete before
-            // ending the test and fail the test if the promise rejects.
-            return flushPromises().then(() => {
-                // Get handle to view button and fire click event
-                const buttonEl = element.shadowRoot.querySelector(
-                    'lightning-button-icon'
-                );
-                buttonEl.click();
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
 
-                const { pageReference } = getNavigateCalledWith();
-                // Verify component called with correct event type and params
-                expect(pageReference.type).toBe(NAV_TYPE);
-                expect(pageReference.attributes.objectApiName).toBe(
-                    NAV_OBJECT_API_NAME
-                );
-                expect(pageReference.attributes.actionName).toBe(
-                    NAV_ACTION_NAME
-                );
-                expect(pageReference.attributes.recordId).toBe(NAV_RECORD_ID);
-            });
+            // Get handle to view button and fire click event
+            const buttonEl = element.shadowRoot.querySelector(
+                'lightning-button-icon'
+            );
+            buttonEl.click();
+
+            const { pageReference } = getNavigateCalledWith();
+            // Verify component called with correct event type and params
+            expect(pageReference.type).toBe(NAV_TYPE);
+            expect(pageReference.attributes.objectApiName).toBe(
+                NAV_OBJECT_API_NAME
+            );
+            expect(pageReference.attributes.actionName).toBe(NAV_ACTION_NAME);
+            expect(pageReference.attributes.recordId).toBe(NAV_RECORD_ID);
         });
     });
 
     describe('error panel', () => {
-        it('renders error if data is not retrieved successfully', () => {
+        it('renders error if data is not retrieved successfully', async () => {
             const WIRE_ERROR = 'Something bad happened';
 
             // Create element and attach to virtual DOM
@@ -143,22 +133,20 @@ describe('c-broker-card', () => {
             });
             document.body.appendChild(element);
 
-            getRecordAdapter.error(WIRE_ERROR);
+            getRecord.error(WIRE_ERROR);
 
-            return flushPromises().then(() => {
-                const errorPanelEl = element.shadowRoot.querySelector(
-                    'c-error-panel'
-                );
-                expect(errorPanelEl).not.toBeNull();
-                expect(errorPanelEl.errors.body).toBe(WIRE_ERROR);
-                expect(errorPanelEl.friendlyMessage).toBe(
-                    'Error retrieving data'
-                );
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            const errorPanelEl =
+                element.shadowRoot.querySelector('c-error-panel');
+            expect(errorPanelEl).not.toBeNull();
+            expect(errorPanelEl.errors.body).toBe(WIRE_ERROR);
+            expect(errorPanelEl.friendlyMessage).toBe('Error retrieving data');
         });
     });
 
-    it('is accessible when property returned', () => {
+    it('is accessible when property returned', async () => {
         const element = createElement('c-broker-card', {
             is: BrokerCard
         });
@@ -166,12 +154,15 @@ describe('c-broker-card', () => {
         document.body.appendChild(element);
 
         // Emit data from @wire
-        getRecordAdapter.emit(mockGetPropertyRecord);
+        getRecord.emit(mockGetPropertyRecord);
 
-        return Promise.resolve().then(() => expect(element).toBeAccessible());
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        await expect(element).toBeAccessible();
     });
 
-    it('is accessible when error returned', () => {
+    it('is accessible when error returned', async () => {
         const WIRE_ERROR = 'Something bad happened';
 
         // Create element and attach to virtual DOM
@@ -180,8 +171,11 @@ describe('c-broker-card', () => {
         });
         document.body.appendChild(element);
 
-        getRecordAdapter.error(WIRE_ERROR);
+        getRecord.error(WIRE_ERROR);
 
-        return Promise.resolve().then(() => expect(element).toBeAccessible());
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        await expect(element).toBeAccessible();
     });
 });

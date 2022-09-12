@@ -26,7 +26,13 @@ describe('c-property-filter', () => {
         jest.clearAllMocks();
     });
 
-    it('fires the change event on new search input', () => {
+    // Helper function to wait until the microtask queue is empty.
+    // Used when having to wait for asynchronous DOM updates.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+
+    it('fires the change event on new search input', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -34,9 +40,8 @@ describe('c-property-filter', () => {
         document.body.appendChild(element);
 
         // Query lightning-input element
-        const lightningInputEl = element.shadowRoot.querySelector(
-            'lightning-input'
-        );
+        const lightningInputEl =
+            element.shadowRoot.querySelector('lightning-input');
         lightningInputEl.dispatchEvent(
             new CustomEvent('change', {
                 detail: {
@@ -54,17 +59,19 @@ describe('c-property-filter', () => {
             minBedrooms: 0,
             minBathrooms: 0
         };
-        return Promise.resolve().then(() => {
-            // Was publish called and was it called with the correct params?
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                FILTERSCHANGEMC,
-                SEARCH_CRITERIA
-            );
-        });
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Was publish called and was it called with the correct params?
+        expect(publish).toHaveBeenCalledWith(
+            undefined,
+            FILTERSCHANGEMC,
+            SEARCH_CRITERIA
+        );
     });
 
-    it('fires the change event on Max Price slider input', () => {
+    it('fires the change event on Max Price slider input', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -72,9 +79,8 @@ describe('c-property-filter', () => {
         document.body.appendChild(element);
 
         // Query lightning-input element
-        const lightningSliderEl = element.shadowRoot.querySelector(
-            'lightning-slider'
-        );
+        const lightningSliderEl =
+            element.shadowRoot.querySelector('lightning-slider');
         lightningSliderEl.dispatchEvent(
             new CustomEvent('change', {
                 detail: {
@@ -92,17 +98,19 @@ describe('c-property-filter', () => {
             minBedrooms: 0,
             minBathrooms: 0
         };
-        return Promise.resolve().then(() => {
-            // Was publish called and was it called with the correct params?
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                FILTERSCHANGEMC,
-                SEARCH_CRITERIA
-            );
-        });
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Was publish called and was it called with the correct params?
+        expect(publish).toHaveBeenCalledWith(
+            undefined,
+            FILTERSCHANGEMC,
+            SEARCH_CRITERIA
+        );
     });
 
-    it('fires the change event on Bedrooms slider input', () => {
+    it('fires the change event on Bedrooms slider input', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -110,9 +118,8 @@ describe('c-property-filter', () => {
         document.body.appendChild(element);
 
         // Query lightning-input element
-        const lightningSliderEl = element.shadowRoot.querySelectorAll(
-            'lightning-slider'
-        )[1];
+        const lightningSliderEl =
+            element.shadowRoot.querySelectorAll('lightning-slider')[1];
         lightningSliderEl.dispatchEvent(
             new CustomEvent('change', {
                 detail: {
@@ -130,17 +137,19 @@ describe('c-property-filter', () => {
             minBedrooms: 2,
             minBathrooms: 0
         };
-        return Promise.resolve().then(() => {
-            // Was publish called and was it called with the correct params?
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                FILTERSCHANGEMC,
-                SEARCH_CRITERIA
-            );
-        });
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Was publish called and was it called with the correct params?
+        expect(publish).toHaveBeenCalledWith(
+            undefined,
+            FILTERSCHANGEMC,
+            SEARCH_CRITERIA
+        );
     });
 
-    it('fires the change event on Bathrooms slider input', () => {
+    it('fires the change event on Bathrooms slider input', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -148,9 +157,8 @@ describe('c-property-filter', () => {
         document.body.appendChild(element);
 
         // Query lightning-input element
-        const lightningSliderEl = element.shadowRoot.querySelectorAll(
-            'lightning-slider'
-        )[2];
+        const lightningSliderEl =
+            element.shadowRoot.querySelectorAll('lightning-slider')[2];
         lightningSliderEl.dispatchEvent(
             new CustomEvent('change', {
                 detail: {
@@ -168,17 +176,19 @@ describe('c-property-filter', () => {
             minBedrooms: 0,
             minBathrooms: 2
         };
-        return Promise.resolve().then(() => {
-            // Was publish called and was it called with the correct params?
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                FILTERSCHANGEMC,
-                SEARCH_CRITERIA
-            );
-        });
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Was publish called and was it called with the correct params?
+        expect(publish).toHaveBeenCalledWith(
+            undefined,
+            FILTERSCHANGEMC,
+            SEARCH_CRITERIA
+        );
     });
 
-    it('fires change event when reset button is clicked', () => {
+    it('fires change event when reset button is clicked', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -186,24 +196,24 @@ describe('c-property-filter', () => {
         document.body.appendChild(element);
 
         // Click reset button
-        const lightningButtonEl = element.shadowRoot.querySelector(
-            'lightning-button'
-        );
+        const lightningButtonEl =
+            element.shadowRoot.querySelector('lightning-button');
         lightningButtonEl.click();
         // Run all fake timers.
         jest.runAllTimers();
 
-        return Promise.resolve().then(() => {
-            // Was publish called and was it called with the correct params?
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                FILTERSCHANGEMC,
-                DEFAULT_SEARCH_CRITERIA
-            );
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Was publish called and was it called with the correct params?
+        expect(publish).toHaveBeenCalledWith(
+            undefined,
+            FILTERSCHANGEMC,
+            DEFAULT_SEARCH_CRITERIA
+        );
     });
 
-    it('resets to default values when reset button is clicked', () => {
+    it('resets to default values when reset button is clicked', async () => {
         // Create initial element
         const element = createElement('c-property-filter', {
             is: PropertyFilter
@@ -243,39 +253,23 @@ describe('c-property-filter', () => {
         );
 
         // Click reset button
-        const lightningButtonEl = element.shadowRoot.querySelector(
-            'lightning-button'
-        );
+        const lightningButtonEl =
+            element.shadowRoot.querySelector('lightning-button');
         lightningButtonEl.click();
 
-        return Promise.resolve().then(() => {
-            // Check for default searchkey value
-            searchKeyEl = element.shadowRoot.querySelector('lightning-input');
-            expect(searchKeyEl.value).toBe(DEFAULT_SEARCH_CRITERIA.searchKey);
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
 
-            sliderEls = element.shadowRoot.querySelectorAll('lightning-slider');
-            // Check for default maxPrice value
-            expect(sliderEls[0].value).toBe(DEFAULT_SEARCH_CRITERIA.maxPrice);
-            // Check for default minBedrooms value
-            expect(sliderEls[1].value).toBe(
-                DEFAULT_SEARCH_CRITERIA.minBedrooms
-            );
-            // Check for default minBathrooms value
-            expect(sliderEls[2].value).toBe(
-                DEFAULT_SEARCH_CRITERIA.minBathrooms
-            );
-        });
-    });
+        // Check for default searchkey value
+        searchKeyEl = element.shadowRoot.querySelector('lightning-input');
+        expect(searchKeyEl.value).toBe(DEFAULT_SEARCH_CRITERIA.searchKey);
 
-    it('is accessible', () => {
-        const element = createElement('c-property-filter', {
-            is: PropertyFilter
-        });
-
-        document.body.appendChild(element);
-
-        return Promise.resolve().then(() => {
-            expect(element).toBeAccessible();
-        });
+        sliderEls = element.shadowRoot.querySelectorAll('lightning-slider');
+        // Check for default maxPrice value
+        expect(sliderEls[0].value).toBe(DEFAULT_SEARCH_CRITERIA.maxPrice);
+        // Check for default minBedrooms value
+        expect(sliderEls[1].value).toBe(DEFAULT_SEARCH_CRITERIA.minBedrooms);
+        // Check for default minBathrooms value
+        expect(sliderEls[2].value).toBe(DEFAULT_SEARCH_CRITERIA.minBathrooms);
     });
 });

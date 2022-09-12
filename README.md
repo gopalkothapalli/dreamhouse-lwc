@@ -1,6 +1,6 @@
 # Dreamhouse Lightning Web Components Sample Application
 
-[![Github Workflow](<https://github.com/trailheadapps/dreamhouse-lwc/workflows/Salesforce%20DX%20(scratch%20org)/badge.svg?branch=master>)](https://github.com/trailheadapps/dreamhouse-lwc/actions?query=workflow%3A%22Salesforce+DX+%28scratch+org%29%22) [![Github Workflow](https://github.com/trailheadapps/dreamhouse-lwc/workflows/Packaging/badge.svg?branch=master)](https://github.com/trailheadapps/dreamhouse-lwc/actions?query=workflow%3A%22Packaging%22) [![codecov](https://codecov.io/gh/trailheadapps/dreamhouse-lwc/branch/master/graph/badge.svg)](https://codecov.io/gh/trailheadapps/dreamhouse-lwc)
+[![CI Workflow](https://github.com/trailheadapps/dreamhouse-lwc/workflows/CI/badge.svg)](https://github.com/trailheadapps/dreamhouse-lwc/actions?query=workflow%3ACI) [![Packaging Workflow](https://github.com/trailheadapps/dreamhouse-lwc/workflows/Packaging/badge.svg)](https://github.com/trailheadapps/dreamhouse-lwc/actions?query=workflow%3APackaging) [![codecov](https://codecov.io/gh/trailheadapps/dreamhouse-lwc/branch/main/graph/badge.svg)](https://codecov.io/gh/trailheadapps/dreamhouse-lwc)
 
 > IMPORTANT: This is the new Lightning Web Components version of the Dreamhouse sample application. If you are looking for the Aura version, click [here](https://github.com/dreamhouseapp/dreamhouse-sfdx).
 
@@ -44,7 +44,7 @@ DreamHouse is a sample application that demonstrates the unique value propositio
 1. If you haven't already done so, authorize your hub org and provide it with an alias (**myhuborg** in the command below):
 
     ```
-    sfdx force:auth:web:login -d -a myhuborg
+    sfdx auth:web:login -d -a myhuborg
     ```
 
 1. Clone this repository:
@@ -104,13 +104,7 @@ Make sure to start from a brand-new environment to avoid conflicts with previous
 
 1. Log in to your org
 
-1. Start an In-App Guidance trial
-
-    - In Setup, navigate to **_User Engagement > In-App Guidance_**.
-    - Click on the **_Start Walkthrough Trial_**.
-    - Click on **_Submit_**.
-
-1. Click [this link](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004slorAAA) to install the Dreamhouse unlocked package in your org.
+1. Click [this link](https://login.salesforce.com/packaging/installPackage.apexp?p0=04t3h000004mAlZAAU) to install the Dreamhouse unlocked package in your org.
 
 1. Select **Install for All Users**
 
@@ -146,14 +140,8 @@ Make sure to start from a brand-new environment to avoid conflicts with previous
 1. Authorize your Trailhead Playground or Developer org and provide it with an alias (**mydevorg** in the command below):
 
     ```
-    sfdx force:auth:web:login -s -a mydevorg
+    sfdx auth:web:login -s -a mydevorg
     ```
-
-1. Start an In-App Guidance trial
-
-    - In Setup, navigate to **_User Engagement > In-App Guidance_**.
-    - Click on the **_Start Walkthrough Trial_**.
-    - Click on **_Submit_**.
 
 1. Run this command in a terminal to deploy the app.
 
@@ -211,7 +199,7 @@ To set up the formatting and linting pre-commit hook:
 Prettier and ESLint will now run automatically every time you commit changes. The commit will fail if linting errors are detected. You can also run the formatting and linting from the command line using the following commands (check out [package.json](./package.json) for the full list):
 
 ```
-npm run lint:lwc
+npm run lint
 npm run prettier
 ```
 

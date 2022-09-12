@@ -4,22 +4,23 @@ import getPagedPropertyList from '@salesforce/apex/PropertyController.getPagedPr
 import { publish, subscribe, MessageContext } from 'lightning/messageService';
 import FILTERSCHANGEMC from '@salesforce/messageChannel/FiltersChange__c';
 import PROPERTYSELECTEDMC from '@salesforce/messageChannel/PropertySelected__c';
-import {
-    registerTestWireAdapter,
-    registerApexTestWireAdapter
-} from '@salesforce/sfdx-lwc-jest';
 
 // Realistic data with multiple records
-const mockGetPagedProperties = require('./data/getPagedPropertyList.json');
+const mockgetPagedPropertyList = require('./data/getPagedPropertyList.json');
 
-// Register the Apex wire adapter
-const getPagedPropertiesAdapter = registerApexTestWireAdapter(
-    getPagedPropertyList
+// Mock getPagedPropertyList Apex wire adapter
+jest.mock(
+    '@salesforce/apex/PropertyController.getPagedPropertyList',
+    () => {
+        const {
+            createApexTestWireAdapter
+        } = require('@salesforce/sfdx-lwc-jest');
+        return {
+            default: createApexTestWireAdapter(jest.fn())
+        };
+    },
+    { virtual: true }
 );
-
-// Register as a standard wire adapter because the component under test requires this adapter.
-// We don't exercise this wire adapter in the tests.
-const messageContextWireAdapter = registerTestWireAdapter(MessageContext);
 
 describe('c-property-tile-list', () => {
     afterEach(() => {
@@ -30,43 +31,47 @@ describe('c-property-tile-list', () => {
         jest.clearAllMocks();
     });
 
+    // Helper function to wait until the microtask queue is empty.
+    // Used when having to wait for asynchronous DOM updates.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+
     describe('@wire data', () => {
-        it('renders properties when data returned', () => {
+        it('renders properties when data returned', async () => {
             const element = createElement('c-property-tile-list', {
                 is: PropertyTileList
             });
             document.body.appendChild(element);
 
             // Emit mock properties
-            getPagedPropertiesAdapter.emit(mockGetPagedProperties);
+            getPagedPropertyList.emit(mockgetPagedPropertyList);
 
-            // Return a promise to wait for any asynchronous DOM updates.
-            return Promise.resolve().then(() => {
-                const propertyTileEls = element.shadowRoot.querySelectorAll(
-                    'c-property-tile'
-                );
-                expect(propertyTileEls.length).toBe(
-                    mockGetPagedProperties.records.length
-                );
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            const propertyTileEls =
+                element.shadowRoot.querySelectorAll('c-property-tile');
+            expect(propertyTileEls.length).toBe(
+                mockgetPagedPropertyList.records.length
+            );
         });
 
-        it('renders error panel when error returned', () => {
+        it('renders error panel when error returned', async () => {
             const element = createElement('c-property-tile-list', {
                 is: PropertyTileList
             });
             document.body.appendChild(element);
 
             // Emit error
-            getPagedPropertiesAdapter.error();
+            getPagedPropertyList.error();
 
-            // Return a promise to wait for any asynchronous DOM updates.
-            return Promise.resolve().then(() => {
-                const errorPanelEl = element.shadowRoot.querySelector(
-                    'c-error-panel'
-                );
-                expect(errorPanelEl).not.toBeNull();
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            const errorPanelEl =
+                element.shadowRoot.querySelector('c-error-panel');
+            expect(errorPanelEl).not.toBeNull();
         });
     });
 
@@ -81,7 +86,7 @@ describe('c-property-tile-list', () => {
         expect(subscribe.mock.calls[0][1]).toBe(FILTERSCHANGEMC);
     });
 
-    it('invokes getPagedProperties with the propertyFilters message payload value', () => {
+    it('invokes getPagedPropertyList with the propertyFilters message payload value', async () => {
         const element = createElement('c-property-tile-list', {
             is: PropertyTileList
         });
@@ -94,41 +99,36 @@ describe('c-property-tile-list', () => {
             minBedrooms: 4,
             minBathrooms: 2
         };
-        publish(messageContextWireAdapter, FILTERSCHANGEMC, messagePayload);
+        publish(MessageContext, FILTERSCHANGEMC, messagePayload);
 
-        return Promise.resolve().then(() => {
-            // The component subscription should cause getRecord to be invoked.
-            // Below we test that it is invoked with the messagePayload value
-            // that was published with the simulated publish invocation above.
-            const receivedPayload = getPagedPropertiesAdapter.getLastConfig();
-            expect(receivedPayload.searchKey).toBe(messagePayload.searchKey);
-            expect(receivedPayload.maxPrice).toBe(messagePayload.maxPrice);
-            expect(receivedPayload.minBedrooms).toBe(
-                messagePayload.minBedrooms
-            );
-            expect(receivedPayload.minBathrooms).toBe(
-                messagePayload.minBathrooms
-            );
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // The component subscription should cause getRecord to be invoked.
+        // Below we test that it is invoked with the messagePayload value
+        // that was published with the simulated publish invocation above.
+        const receivedPayload = getPagedPropertyList.getLastConfig();
+        expect(receivedPayload.searchKey).toBe(messagePayload.searchKey);
+        expect(receivedPayload.maxPrice).toBe(messagePayload.maxPrice);
+        expect(receivedPayload.minBedrooms).toBe(messagePayload.minBedrooms);
+        expect(receivedPayload.minBathrooms).toBe(messagePayload.minBathrooms);
     });
 
-    it('sends propertySelected event when c-property-tile selected', () => {
+    it('sends propertySelected event when c-property-tile selected', async () => {
         const element = createElement('c-property-tile-list', {
             is: PropertyTileList
         });
         document.body.appendChild(element);
-        getPagedPropertiesAdapter.emit(mockGetPagedProperties);
+        getPagedPropertyList.emit(mockgetPagedPropertyList);
 
-        return Promise.resolve().then(() => {
-            const propertyTile = element.shadowRoot.querySelector(
-                'c-property-tile'
-            );
-            propertyTile.dispatchEvent(new CustomEvent('selected'));
-            expect(publish).toHaveBeenCalledWith(
-                undefined,
-                PROPERTYSELECTEDMC,
-                { propertyId: null }
-            );
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        const propertyTile =
+            element.shadowRoot.querySelector('c-property-tile');
+        propertyTile.dispatchEvent(new CustomEvent('selected'));
+        expect(publish).toHaveBeenCalledWith(undefined, PROPERTYSELECTEDMC, {
+            propertyId: null
         });
     });
 });
