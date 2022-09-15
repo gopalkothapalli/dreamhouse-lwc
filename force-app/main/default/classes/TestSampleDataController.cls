@@ -5,7 +5,7 @@ private class TestSampleDataController {
         Test.startTest();
         SampleDataController.importSampleData();
         Test.stopTest();
-//first commit
+//first commit done
         Integer propertyNumber = [SELECT COUNT() FROM Property__c];
         Integer brokerNumber = [SELECT COUNT() FROM Broker__c];
         Integer contactNumber = [SELECT COUNT() FROM Contact];
