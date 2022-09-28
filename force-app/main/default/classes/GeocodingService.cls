@@ -12,6 +12,7 @@ public with sharing class GeocodingService {
 //test 4
 //test 5
 //test 6
+//test 7
         for (GeocodingAddress address : addresses) {
             String geocodingUrl = BASE_URL;
             geocodingUrl += (String.isNotBlank(address.street))
