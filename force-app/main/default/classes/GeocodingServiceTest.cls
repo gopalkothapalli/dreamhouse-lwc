@@ -12,6 +12,7 @@ private with sharing class GeocodingServiceTest {
     //new change 1
     //test 54
     //test 3
+    //test 4
     static void successResponse() {
         // GIVEN
         GeocodingService.GeocodingAddress address = new GeocodingService.GeocodingAddress();
