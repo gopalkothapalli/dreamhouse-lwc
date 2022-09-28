@@ -8,12 +8,7 @@ public with sharing class GeocodingService {
         List<Coordinates> computedCoordinates = new List<Coordinates>();
 //gokul edit 1
 //test 2
-//test 3
-//test 4
-//test 5
-//test 6
-//test 7
-//test 8
+
         for (GeocodingAddress address : addresses) {
             String geocodingUrl = BASE_URL;
             geocodingUrl += (String.isNotBlank(address.street))
